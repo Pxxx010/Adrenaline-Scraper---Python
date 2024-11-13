@@ -35,6 +35,5 @@ uvicorn main:app --reload
 - POST `/update-news` - Força atualização das notícias
 - POST `/send-email` - Força envio de email
 - GET `/status` - Retorna status do scraper
-- GET `/scheduler-status` - Retorna status do agendador
 
 O scraper executará automaticamente todos os dias às 12:00 da manhã.
