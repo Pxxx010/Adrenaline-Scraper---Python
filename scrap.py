@@ -21,10 +21,10 @@ class AdrenalineScraper:
 
     def get_news_data(self):
         try:
-            print("Fazendo requisição para a página do Adrenaline...".encode("utf-8"))
+            print("Fazendo requisição para a página do Adrenaline...")
             response = requests.get(self.url, headers=self.headers)
             response.raise_for_status()
-
+            
             print(f"Status Code: {response.status_code}")
             soup = BeautifulSoup(response.content, 'html.parser')
 
@@ -42,7 +42,7 @@ class AdrenalineScraper:
                     if title_elem and link_elem:
                         title = title_elem.text.strip()
                         link = link_elem['href']
-                        date = date_elem.text.strip() if date_elem else "Data não disponível"
+                        date = datetime.now().strftime("%d/%m/%Y")
 
                         news_data = {
                             'título': title,
@@ -50,14 +50,13 @@ class AdrenalineScraper:
                             'data': date
                         }
                         news_list.append(news_data)
-                        print(f"Notícia encontrada: {title}".encode("utf-8"))
                 except Exception as e:
-                    print(f"Erro ao processar artigo: {e}".encode("utf-8"))
+                    print(f"Erro ao processar artigo: {e}")
                     continue
 
             return news_list
         except Exception as e:
-            print(f"Erro ao fazer scraping: {e}".encode("utf-8"))
+            print(f"Erro ao fazer scraping: {e}")
             return []
 
 class EmailSender:
@@ -131,26 +130,25 @@ class EmailSender:
 
             msg.attach(MIMEText(html_content, 'html'))
 
-            print("Conectando ao servidor SMTP...".encode("utf-8"))
+            print("Conectando ao servidor SMTP...")
             server = smtplib.SMTP('smtp.gmail.com', 587)
             server.starttls()
             
-            print("Fazendo login no email...".encode("utf-8"))
+            print("Fazendo login no email...")
             server.login(self.email_from, self.email_password)
             
-            print("Enviando email...".encode("utf-8"))
             server.send_message(msg)
             server.quit()
             
-            print("Email enviado com sucesso!".encode("utf-8"))
+            print("Email enviado com sucesso!")
         except Exception as e:
-            print(f"Erro ao enviar email: {e}".encode("utf-8"))
+            print(f"Erro ao enviar email: {e}")
 
 def main():
-    print("Verificando configurações...".encode("utf-8"))
+    print("Verificando configurações...")
     
     if not os.path.isfile('.env'):
-        print("Erro: Arquivo .env não encontrado!".encode("utf-8"))
+        print("Erro: Arquivo .env não encontrado!")
         return
     
     email_from = os.getenv('EMAIL_FROM')
@@ -158,22 +156,22 @@ def main():
     email_to = os.getenv('EMAIL_TO')
     
     if not all([email_from, email_password, email_to]):
-        print("Erro: Configurações de email incompletas no arquivo .env!".encode("utf-8"))
-        print(f"EMAIL_FROM: {'Configurado' if email_from else 'Não configurado'}".encode("utf-8"))
-        print(f"EMAIL_PASSWORD: {'Configurado' if email_password else 'Não configurado'}".encode("utf-8"))
-        print(f"EMAIL_TO: {'Configurado' if email_to else 'Não configurado'}".encode("utf-8"))
+        print("Erro: Configurações de email incompletas no arquivo .env!")
+        print(f"EMAIL_FROM: {'Configurado' if email_from else 'Não configurado'}")
+        print(f"EMAIL_PASSWORD: {'Configurado' if email_password else 'Não configurado'}")
+        print(f"EMAIL_TO: {'Configurado' if email_to else 'Não configurado'}")
         return
 
-    print("Iniciando scraping do Adrenaline...".encode("utf-8"))
+    print("Iniciando scraping do Adrenaline...")
     scraper = AdrenalineScraper()
     news_data = scraper.get_news_data()
 
     if news_data:
-        print(f"Encontradas {len(news_data)} notícias. Preparando para enviar email...".encode("utf-8"))
+        print(f"Encontradas {len(news_data)} notícias. Preparando para enviar email...")
         email_sender = EmailSender()
         email_sender.send_email(news_data)
     else:
-        print("Nenhuma notícia foi coletada para enviar.".encode("utf-8"))
+        print("Nenhuma notícia foi coletada para enviar.")
 
 if __name__ == "__main__":
     main()
